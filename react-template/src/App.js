@@ -1,12 +1,30 @@
-import React from 'react';
+import React , {useState} from 'react';
+import axios from 'axios'
 
-const App = () => {
+const App = (props) => {
+  const [value, setValue] = useState(10)
 
-    return (
-      <div>
-        <h1>大雄快起床，上學要遲到了</h1>
-      </div>
-    )
+
+  axios.get('http://localhost:3001/notes').then(response => {
+    const notes = response.data
+    console.log(notes)
+  })
+
+
+  const hello = (who) => {
+    const handler = () => {
+      alert('hello', who)
+    }
+    return handler
   }
 
+  return (
+    <div>
+      {value}
+      <button onClick={hello('world')}>button</button>
+      <button onClick={hello('react')}>button</button>
+      <button onClick={hello('function')}>button</button>
+    </div>
+  )
+}
 export default App;
