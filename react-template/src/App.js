@@ -2,7 +2,7 @@ import React , {useState} from 'react';
 import axios from 'axios'
 
 const App = (props) => {
-  const [value, setValue] = useState(10)
+  const [value] = useState(10)
 
 
   axios.get('http://localhost:3001/notes').then(response => {

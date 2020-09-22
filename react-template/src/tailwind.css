@@ -18812,6 +18812,22 @@ video {
   animation: bounce 1s infinite;
 }
 
+.error {
+  color: red;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.note {
+  color: grey;
+  padding-top: 5px;
+  font-size: 15px;
+}
+
 @media (min-width: 640px) {
   .sm\:container {
     width: 100%;
@@ -91635,3 +91651,4 @@ video {
     animation: bounce 1s infinite;
   }
 }
+  
