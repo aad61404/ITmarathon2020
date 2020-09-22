@@ -1,29 +1,16 @@
-import React , {useState} from 'react';
-import axios from 'axios'
+import React  from 'react';
+import Counter from './components/Counter'
+import counter from './reducers'
 
-const App = (props) => {
-  const [value] = useState(10)
-
-
-  axios.get('http://localhost:3001/notes').then(response => {
-    const notes = response.data
-    console.log(notes)
-  })
-
-
-  const hello = (who) => {
-    const handler = () => {
-      alert('hello', who)
-    }
-    return handler
-  }
+const App = () => {
 
   return (
     <div>
-      {value}
-      <button onClick={hello('world')}>button</button>
-      <button onClick={hello('react')}>button</button>
-      <button onClick={hello('function')}>button</button>
+      <Counter
+        value={store.getState()}
+        onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
+        onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
+      />
     </div>
   )
 }
