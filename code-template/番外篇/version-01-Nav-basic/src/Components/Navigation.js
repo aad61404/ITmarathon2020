@@ -10,7 +10,7 @@ function Navigation() {
     if(showMenu) {
         menu = 
         <div
-            className="fixed bg-yellow-300 top-0 left-0 w-4/5 h-full z-50"
+            className="fixed bg-white top-0 left-0 w-4/5 h-fill z-50"
         >
             The menu
         </div>
