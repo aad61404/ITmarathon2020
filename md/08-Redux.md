@@ -12,9 +12,16 @@ https://react-redux.js.org/introduction/quick-start
 
 ![Redux](https://i.imgur.com/Ed9SxN8.jpg)
 
+
+[Redux 連結](https://redux.js.org/)
+
+--------------------------------------------------------------------
 --------------------------------------------------------------------
 
 ![React-Redux](https://i.imgur.com/b8XQaId.jpg)
+
+[React-Redux連結](https://react-redux.js.org/)
+
 
 文章範例是 7.0， 介紹官網的 TodoList (工作清單) Example
 

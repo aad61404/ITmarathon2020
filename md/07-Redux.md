@@ -17,23 +17,59 @@ Redux是JavaScript狀態容器 可以讓你構建一致化的應用，運行於�
 Redux 介紹三個最主要的元素
 
 這張圖的步驟非常完整
-![Gif](https://i.imgur.com/QWSeI69.gif)
+![Gifa](https://i.imgur.com/QWSeI69.gif)
 
 
 在網頁上View操作送出事件，經過Action 釐清事件到 Reducer 處理完回傳一個新的State到網頁(View)上
 
-Action
+### Action
 描述 事件發生的情況
 
-Reducer 
+### Reducer 
 根據接收Action 描述的情況對資料做處理，回傳一新的個處理資料
 
-store
+### store
 儲存資料的地方，統一state
 
 
 為什麼我們需要Redux呢?
 沒有Redux 我們的資料流向會變成什麼樣子 ? 這張圖可以有很好的解釋
 ![IMG](https://i.imgur.com/2vbnyiv.png)
-....待補
 
+
+結束前看個範例 簡單的加減 計數器
+套用到我們上面的 三大元素
+
+#### action
+```
+store.dispatch({ type: 'INCREMENT' })
+```
+
+#### reducer
+```
+function counter(state, action) {
+    if (typeof state === "undefined") {
+        return 0;
+    }
+
+    switch (action.type) {
+        case "INCREMENT":
+        return state + 1;
+        case "DECREMENT":
+        return state - 1;
+        default:
+        return state;
+    }
+}
+```
+
+#### store
+```
+ var store = Redux.createStore(counter);
+```
+vanilla 範例
+https://codesandbox.io/s/redux07-vanilla-hv7e0
+
+資料來源
+https://blog.mazarin.lk/productive-development-react-redux/
+https://kknews.cc/code/leorgxb.html
