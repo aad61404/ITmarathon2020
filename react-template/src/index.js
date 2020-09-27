@@ -1,15 +1,18 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react'
+import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux';
+import reducer from './reducer'
+import App from './App.js'
+import './index.css';
 
-import { Provider } from "react-redux";
-import store from "./redux/store";
-
-import TodoApp from "./TodoApp";
-
-const rootElement = document.getElementById("root");
-ReactDOM.render(
-  <Provider store={store}>
-    <TodoApp />
-  </Provider>,
-  rootElement
-);
+const store = createStore(
+   reducer,
+   window.__REDUX_DEVTOOLS_EXTENSION__ && 
+   window.__REDUX_DEVTOOLS_EXTENSION__()
+)
+render(
+   <Provider store = {store}>
+      <App />
+   </Provider>, document.getElementById('root')
+)
