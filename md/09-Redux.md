@@ -1,99 +1,224 @@
+雖然是Redux TodoList 最後一篇
+但發現好像沒有特別解釋程式的部分
 
-前情提要
+原因是這幾天 我都在工作專案中鬼打牆
+下了班還要繼續寫
 
-今天在繼續寫TodoList前
-先複習一下 react-redux 的使用方法
-
-* 再次提醒 
-redux連結中，Redux Essentials 是有使用hook的，但你如果維護的React專案版本較舊
-請先觀看 同樣是在 redux連結中 Basics Tutorial
-
-(比如說: 我維護的專案就是React 16.4)
-那我在看React-Redux時就要算選擇之前的版本  7.0
-[Redux 連結](https://redux.js.org/)
-[React-Redux連結](https://react-redux.js.org/)
-
---------------------------------------------------
+學習跟實作的時間 少很多
+文章就水水的
 
 
-https://codesandbox.io/
-當你使用CodeSandbox時，它可以快速建立一個環境方便你開發、測試
+開始前還是要先看推薦一下這篇
+也許你不需要 redux 
+https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367
 
+其中有提到 如果你不知道自己專案需不需要使用redux
+很可能就不需要...
 
-個人的DashBoard面板
-![DashBoard](https://i.imgur.com/zWVRZ5m.png)
+-------------------------------------------
+今天就來繼續 TodoList
 
-創建一個template
-
-![template](https://i.imgur.com/lAXUFEf.png)
-
-選擇react-redux
-![react-redux](https://i.imgur.com/sO0Htt3.png)
-
-確認你是否還記得 action , reducers , stores 之間的關係
-需注意的是 counter 範例中使用的是 redux 
-而我們接下來要使用的是 react-redux
-來看看兩者的差異吧
-
-Counter 範例
-https://codesandbox.io/s/github/reduxjs/redux/tree/master/examples/counter?file=/src/index.js
-TodoList 範例
-https://codesandbox.io/s/9on71rvnyo
-
-
-#### Counter 範例使用redux
-index.js
+index.js 知道今天的主軸是 TodoApp
 ```
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { createStore } from 'redux'
-import Counter from './components/Counter'
-import counter from './reducers'
+import React from "react";
+import ReactDOM from "react-dom";
 
-const store = createStore(counter)
-const rootEl = document.getElementById('root')
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
-const render = () => ReactDOM.render(
-  <Counter
-    value={store.getState()}
-    onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
-    onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
-  />,
-  rootEl
-)
+import TodoApp from "./TodoApp";
 
-render()
-store.subscribe(render)
-
-```
-
-#### TodoList 範例中使用 react-redux
-index.js
-```
-import React from 'react'
-import ReactDOM from 'react-dom'
-
-import { Provider } from 'react-redux'
-import store from './store'
-
-import App from './App'
-
-const rootElement = document.getElementById('root')
+const rootElement = document.getElementById("root");
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <TodoApp />
   </Provider>,
   rootElement
-)
-```
-store.js
-```
-import { createStore } from "redux";
-import rootReducer from "./reducers";
-
-export default createStore(rootReducer);
+);
 ```
 
-剛開始兩者容易混淆，但先看完redux的核心概念後再去看react-redux
-概念就會清晰很多
 
+我們可以看出 TodoList 三個階層 AddTodo ,  TodoList , VisibilityFilters
+```
+import React from "react";
+import AddTodo from "./components/AddTodo";
+import TodoList from "./components/TodoList";
+import VisibilityFilters from "./components/VisibilityFilters";
+import "./styles.css";
+
+export default function TodoApp() {
+  return (
+    <div className="todo-app">
+      <h1>Todo List</h1>
+      <AddTodo />
+      <TodoList />
+      <VisibilityFilters />
+    </div>
+  );
+}
+
+```
+
+---------------------------------------------
+
+先看 AddTodo 組件
+需要建立一個 input 利用組件內state ，輸入值時onChange 儲存變化，
+再創建 button 將本地存好的input value 送出並清空
+結尾處 connect  將 addTodo 裡面的action 跟 AddTodo 組件綁再一起
+
+
+./src/components/AddTodo.js
+```
+import React from "react";
+import { connect } from "react-redux";
+import { addTodo } from "../redux/actions";
+
+class AddTodo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { input: "" };
+  }
+
+  updateInput = input => {
+    this.setState({ input });
+  };
+
+  handleAddTodo = () => {
+    this.props.addTodo(this.state.input);
+    this.setState({ input: "" });
+  };
+
+  render() {
+    return (
+      <div>
+        <input
+          onChange={e => this.updateInput(e.target.value)}
+          value={this.state.input}
+        />
+        <button className="add-todo" onClick={this.handleAddTodo}>
+          Add Todo
+        </button>
+      </div>
+    );
+  }
+}
+
+export default connect(
+  null,
+  { addTodo }
+)(AddTodo);
+// export default AddTodo;
+
+```
+
+--------------------------------------------
+todoList 為中間顯示 欄位
+會收到  Filter 的  action 變更顯示的值 (決定現在該顯示的狀態，all-全部、completed-完成、incompleted-未完成)
+show出 資料 算是Todo (細項)的外層
+
+./src/components/todoList.js
+
+```
+import React from "react";
+import { connect } from "react-redux";
+import Todo from "./Todo";  
+import { getTodosByVisibilityFilter } from "../redux/selectors";
+
+const TodoList = ({ todos }) => (
+  <ul className="todo-list">
+    {todos && todos.length
+      ? todos.map((todo, index) => {
+          return <Todo key={`todo-${todo.id}`} todo={todo} />;
+        })
+      : "No todos, yay!"}
+  </ul>
+);
+
+const mapStateToProps = state => {
+  const { visibilityFilter } = state;
+  const todos = getTodosByVisibilityFilter(state, visibilityFilter);
+  return { todos };
+};
+// export default TodoList;
+export default connect(mapStateToProps)(TodoList);
+
+```
+
+Todo.js
+顯示每一項資料的 及點擊事件
+
+
+```
+import React from "react";
+import { connect } from "react-redux";
+import cx from "classnames";
+import { toggleTodo } from "../redux/actions";
+
+const Todo = ({ todo, toggleTodo }) => (
+  <li className="todo-item" onClick={() => toggleTodo(todo.id)}>
+    {todo && todo.completed ? "👌" : "👋"}{" "}
+    <span
+      className={cx(
+        "todo-item__text",
+        todo && todo.completed && "todo-item__text--completed"
+      )}
+    >
+      {todo.content}
+    </span>
+  </li>
+);
+
+// export default Todo;
+export default connect(
+  null,
+  { toggleTodo }
+)(Todo);
+
+```
+
+VisibilityFilters.js
+
+```
+import React from "react";
+import cx from "classnames";
+import { connect } from "react-redux";
+import { setFilter } from "../redux/actions";
+import { VISIBILITY_FILTERS } from "../constants";
+
+const VisibilityFilters = ({ activeFilter, setFilter }) => {
+  return (
+    <div className="visibility-filters">
+      {Object.keys(VISIBILITY_FILTERS).map(filterKey => {
+        const currentFilter = VISIBILITY_FILTERS[filterKey];
+        return (
+          <span
+            key={`visibility-filter-${currentFilter}`}
+            className={cx(
+              "filter",
+              currentFilter === activeFilter && "filter--active"
+            )}
+            onClick={() => {
+              setFilter(currentFilter);
+            }}
+          >
+            {currentFilter}
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+const mapStateToProps = state => {
+  return { activeFilter: state.visibilityFilter };
+};
+// export default VisibilityFilters;
+export default connect(
+  mapStateToProps,
+  { setFilter }
+)(VisibilityFilters);
+
+```
+
+
+https://github.com/aad61404/ITmarathon2020/tree/master/code-template/09-redux-Todos/src
